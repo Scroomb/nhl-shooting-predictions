@@ -173,11 +173,11 @@ if __name__ == '__main__':
     # plot_heat_map(df_2010_scoring)
     # df_2010_shots = get_shot_coords(coll)
 
-    shots, goals = load_shots_goals(2017)
-
-    # # Nathan MacKinnon 8477492
-    nm_shots, nm_goals = player_shots_goals(8477492,shots,goals)
-    # nm_pct = make_shooting_pct(nm_shots[['x','y']],nm_goals[['x','y']])
+    # shots, goals = load_shots_goals(2017)
+    #
+    # # # Nathan MacKinnon 8477492
+    # nm_shots, nm_goals = player_shots_goals(8477492,shots,goals)
+    # # nm_pct = make_shooting_pct(nm_shots[['x','y']],nm_goals[['x','y']])
     #
     # # Pekka Rinne 8471469
     # pr_goals = goals[goals.goalie==8471469]

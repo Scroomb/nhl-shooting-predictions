@@ -18,4 +18,7 @@ The data is accessed through a public API.  Endpoints exist for individual games
 ##### Pekka Rinne Shots
 ![Pekka Rinne](/figs/pr_shots.png)
 
- 1) What your project is about (what is the question you are trying to answer) , 2) What your data is like (including, hopefully, some EDA) and 3) your methodology (what model(s) are you using to try to get an answer?).
+### Model  
+Right now I am using a 2 hidden layer MLP with 100 nodes each.
+
+![MacKinnon vs Rinne](/figs/nm_vs_pr.png)
