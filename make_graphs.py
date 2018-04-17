@@ -3,6 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.stats import kde
+from matplotlib.patches import Circle
 
 def _init_mongo():
     client = pymongo.MongoClient()
@@ -137,13 +138,25 @@ def load_shots_goals(year):
     goals.drop('Unnamed: 0',axis=1,inplace=True)
     shots.x = shots.x.abs()
     goals.x = goals.x.abs()
-    return shots.astype('int64'),goals.astype('int64')
+    return shots,goals
 
-def plot_kde(density):
+def plot_kde(density,player,type):
     xx,yy = np.meshgrid(np.arange(0,100,1),np.arange(-42,43,1))
     xy = np.vstack([xx.ravel(),yy.ravel()])
     plt.pcolormesh(xx,yy,density.reshape(xx.shape),cmap=plt.cm.jet)
-    plt.colorbar()
+    plt.title(player + ' ' + type)
+    plt.xlabel('X-coordinate 1-ft')
+    plt.ylabel('Y-coordinate 1-ft')
+    plt.axvline(x=25,c='k')
+    plt.axvline(x=89,c='k')
+    circle1 = plt.Circle((69,-22),radius=15,clip_on=False, zorder=10, linewidth=1,
+                    edgecolor='black', facecolor=(0, 0, 0, .0001))
+    circle2 = plt.Circle((69,22),radius=15,clip_on=False, zorder=10, linewidth=1,
+                    edgecolor='black', facecolor=(0, 0, 0, .0001))
+    goal = plt.Rectangle((89,-3),2,6,edgecolor='black', facecolor=(0,0,0,.0001))
+    plt.gca().add_patch(circle1)
+    plt.gca().add_patch(circle2)
+    plt.gca().add_patch(goal)
     plt.show()
 
 if __name__ == '__main__':
@@ -160,10 +173,10 @@ if __name__ == '__main__':
     # plot_heat_map(df_2010_scoring)
     # df_2010_shots = get_shot_coords(coll)
 
-    # shots, goals = load_shots_goals(2017)
+    shots, goals = load_shots_goals(2017)
 
     # # Nathan MacKinnon 8477492
-    # nm_shots, nm_goals = player_shots_goals(8477492,shots,goals)
+    nm_shots, nm_goals = player_shots_goals(8477492,shots,goals)
     # nm_pct = make_shooting_pct(nm_shots[['x','y']],nm_goals[['x','y']])
     #
     # # Pekka Rinne 8471469

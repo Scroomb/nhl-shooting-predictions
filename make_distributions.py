@@ -1,7 +1,5 @@
 from sklearn.neighbors import KernelDensity
 from sklearn.model_selection import GridSearchCV
-from keras.models import Sequential
-from keras.layers import Dense, Activation
 import numpy as np
 import pandas as pd
 from make_graphs import player_shots_goals, goalie_shots_goals, load_shots_goals
@@ -35,7 +33,7 @@ def retrieve_density(player,position,dist_type,year=2017):
         y = coll.find_one({'player_id':player})[dist_type][0]
     else:
         y = coll.find_one({'player_id':player})[dist_type][0]
-    return pkl.loads(y).reshape(85,100)
+    return pkl.loads(y)
 
 def generate_all_distributions(shots,goals):
     goalies = []
@@ -99,8 +97,8 @@ def single_row(row,e_type):
     scorer = str(row[e_type])
     x = row['x']
     y = row['y']+42
-    g_density = 1-retrieve_density(goalie,'goalie',2017)
-    p_density = retrieve_density(scorer,'player',2017)
+    g_density = 1-retrieve_density(goalie,'goalie',2017).reshape(85,100)
+    p_density = retrieve_density(scorer,'player',2017).reshape(85,100)
     g_g_den = g_density[y][x]
     g_p_den = p_density[y][x]
     return np.append(row,[g_p_den,g_g_den])
@@ -121,7 +119,7 @@ if __name__ == '__main__':
 
     # feature = np.concatenate((goal_d.reshape(1,goal_d.shape[0]),save_d.reshape(1,save_d.shape[0])),axis=1)
 
-    generate_all_distributions(shots,goals)
+    # generate_all_distributions(shots,goals)
 
     # model = Sequential()
     # model.add(Dense(32, input_dim=784))
