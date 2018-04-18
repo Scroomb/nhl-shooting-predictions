@@ -140,7 +140,7 @@ def load_shots_goals(year):
     goals.x = goals.x.abs()
     return shots,goals
 
-def plot_kde(density,player,type):
+def plot_kde(density,player='test',type='test'):
     xx,yy = np.meshgrid(np.arange(0,100,1),np.arange(-42,43,1))
     xy = np.vstack([xx.ravel(),yy.ravel()])
     plt.pcolormesh(xx,yy,density.reshape(xx.shape),cmap=plt.cm.jet)

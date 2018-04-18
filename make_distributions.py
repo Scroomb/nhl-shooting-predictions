@@ -32,7 +32,7 @@ def save_density_to_db(year,player,density,dist_type,position):
     else:
         coll.update_one({'player_id':player},{'$push':{dist_type:y}})
 
-def retrieve_density(player,position,dist_type,year=2017):
+def retrieve_density(db,player,position,dist_type,year=2017):
     coll = db['players_year_'+str(year)+str(year+1)]
     if position == 'goalie':
         y = coll.find_one({'player_id':player})[dist_type][0]
@@ -98,13 +98,13 @@ def generate_all_distributions(shots,goals):
         else:
             print(scorer[1], ' scorer shot dist exists')
 
-def single_row(row,e_type):
+def single_row(db,row,p_type):
     goalie = str(int(row['goalie']))
-    scorer = str(int(row[e_type]))
     x = int(row['x'])
+    scorer = str(int(row[p_type]))
     y = int(row['y'])+42
-    g_density = 1-retrieve_density(goalie,'goalie','save_dist').reshape(85,100)
-    p_density = retrieve_density(scorer,'player','goal_dist').reshape(85,100)
+    g_density = 1-retrieve_density(db,goalie,'goalie','save_dist').reshape(85,100)
+    p_density = retrieve_density(db,scorer,'player','goal_dist').reshape(85,100)
     g_g_den = g_density[y][x]
     g_p_den = p_density[y][x]
     return np.append(row,[g_p_den,g_g_den])
@@ -112,26 +112,35 @@ def single_row(row,e_type):
 def make_data(db,shots,goals):
     coll = db['players_year_20172018']
     goal_data = []
+
     for row in goals.iterrows():
-        row_d = single_row(row[1],'scorer')
-        row_d = np.append(row_d,1)
-        goal_data.append(row_d)
+        if coll.find_one({'player_id':str(int(row[1]['scorer']))}) and coll.find_one({'player_id':str(int(row[1]['goalie']))}):
+            shooter_goal = bool('goal_dist' in coll.find_one({'player_id':str(int(row[1]['scorer']))}).keys())
+            goalie_save = bool('save_dist' in coll.find_one({'player_id':str(int(row[1]['goalie']))}).keys())
+            if not(shooter_goal and goalie_save):
+                continue
+            row_d = single_row(db,row[1],'scorer')
+            row_d = np.append(row_d,1)
+            goal_data.append(row_d)
     goal_data = np.array(goal_data)
     gd = goal_data[:,2:]
 
     shot_data = []
     for row in shots.iterrows():
         row_d = row[1]
-        if bool('shot_dist' in coll.find_one({'player_id':str(int(row_d['goalie']))}).keys()):
-            row_data = single_row(row_d,'shooter')
+        if coll.find_one({'player_id':str(int(row_d['shooter']))}) and coll.find_one({'player_id':str(int(row_d['goalie']))}):
+            shooter_goal = bool('goal_dist' in coll.find_one({'player_id':str(int(row_d['shooter']))}).keys())
+            goalie_save = bool('save_dist' in coll.find_one({'player_id':str(int(row_d['goalie']))}).keys())
+            if not(shooter_goal and goalie_save):
+                continue
+            row_data = single_row(db,row_d,'shooter')
             row_data = np.append(row_data,0)
             shot_data.append(row_data)
     shot_data = np.array(shot_data)
     sd = shot_data[:,2:]
     td = np.concatenate((gd,sd),axis=0)
-    td_x = td[:,:-1]
-    td_y = td[:,-1]
-    return td_x, td_y
+
+    return td
 
 
 
@@ -150,29 +159,23 @@ if __name__ == '__main__':
 
     # generate_all_distributions(shots,goals)
 
-    td_x, td_y = make_data(db,nm_shots,nm_goals)
+    td = make_data(db,shots,goals)
+    #
+    # td_x = td[:,:-1]
+    # td_y = td[:,-1]
+    #
+    # sm = SMOTE(kind='regular')
+    #
+    # x_res, y_res = sm.fit_sample(td_x,td_y)
 
-    sm = SMOTE(kind='regular')
-
-    X_res, y_res = sm.fit_sample(td_x,td_y)
-
-    x_train,x_test,y_train,y_test = train_test_split(X_res,y_res,test_size=.2)
+    x_train,x_test,y_train,y_test = train_test_split(x_res,y_res,test_size=.2)
     x_scaler = StandardScaler()
 
     x_std = x_scaler.fit_transform(x_train)
     x_t_std = x_scaler.transform(x_test)
 
-
-    model = Sequential()
-    model.add(Dense(100, input_dim=4, activation='relu', kernel_initializer='uniform'))
-    model.add(Dropout(0.5))
-    model.add(Dense(100, activation='relu', kernel_initializer='uniform'))
-    model.add(Dropout(0.5))
-    model.add(Dense(1, activation='sigmoid', kernel_initializer='uniform'))
-
-    model.compile(loss='binary_crossentropy',
-                  optimizer='adagrad',
-                  metrics=['binary_accuracy'])
+    #
+    
 
     model.fit(x_std, y_train,
               epochs=50,
