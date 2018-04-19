@@ -1,6 +1,5 @@
 from imblearn.over_sampling import SMOTE
 from make_graphs import player_shots_goals, goalie_shots_goals, load_shots_goals
-import make_distributions
 import pymongo
 import pandas as pd
 import numpy as np
@@ -106,7 +105,7 @@ def scale_transform_split(td):
 if __name__ == '__main__':
     db = _init_mongo()
     shots, goals = load_shots_goals(2017)
-    nm_shots, nm_goals = player_shots_goals(8477492,shots,goals)
+    # nm_shots, nm_goals = player_shots_goals(8477492,shots,goals)
 
     td = make_data(db,shots,goals)
     np.savetxt('data/2017_shots_goals_goalie.csv',delimiter=',')
