@@ -11,37 +11,7 @@ from make_graphs import plot_kde
 import pickle as pkl
 from sklearn.model_selection import GridSearchCV
 from keras.wrappers.scikit_learn import KerasClassifier
-from keras import backend as K
-
-def f1(y_true, y_pred):
-    def recall(y_true, y_pred):
-        """Recall metric.
-
-        Only computes a batch-wise average of recall.
-
-        Computes the recall, a metric for multi-label classification of
-        how many relevant items are selected.
-        """
-        true_positives = K.sum(K.round(K.clip(y_true * y_pred, 0, 1)))
-        possible_positives = K.sum(K.round(K.clip(y_true, 0, 1)))
-        recall = true_positives / (possible_positives + K.epsilon())
-        return recall
-
-    def precision(y_true, y_pred):
-        """Precision metric.
-
-        Only computes a batch-wise average of precision.
-
-        Computes the precision, a metric for multi-label classification of
-        how many selected items are relevant.
-        """
-        true_positives = K.sum(K.round(K.clip(y_true * y_pred, 0, 1)))
-        predicted_positives = K.sum(K.round(K.clip(y_pred, 0, 1)))
-        precision = true_positives / (predicted_positives + K.epsilon())
-        return precision
-    precision = precision(y_true, y_pred)
-    recall = recall(y_true, y_pred)
-    return 2*((precision*recall)/(precision+recall+K.epsilon()))
+from keras.models import load_model
 
 def _init_mongo():
     client = pymongo.MongoClient()
@@ -83,7 +53,7 @@ def define_model(input_size,nuerons_layer_1=100,neurons_layer_2=100,neurons_laye
 
     model.compile(loss='binary_crossentropy',
                   optimizer='adagrad',
-                  metrics=[f1])
+                  metrics=['accuracy'])
     return model
 
 def scale_transform_split(td):
@@ -144,10 +114,12 @@ def retrieve_density(db,player,position,dist_type,year=2017):
 if __name__ == '__main__':
     db = _init_mongo()
     td = np.genfromtxt('data/2017_total_data.csv',delimiter=',')
-    # td = np.genfromtxt('data/2017_shots_goals_goalie.csv',delimiter=',')
+    td = np.genfromtxt('data/2017_shots_goals_goalie.csv',delimiter=',')
 
     x_std,x_t_std,y_train,y_test,x_scaler = scale_transform_split(td)
-    model = define_model(4)
+    # model = define_model(4)
+    model = load_model('trained_model.h5')
+
     # model = KerasClassifier(build_fn=define_model,verbose=1,input_size=4,epochs=100,batch_size=32)
     # param_grid = dict(nuerons_layer_1=[25,50,100,500],neurons_layer_2=[25,50,100,500])
     # param_grid = dict(epochs = [10,25,50,100], batch_size=[32,128,512]) # epochs = 100, batch_size = 32
@@ -162,12 +134,28 @@ if __name__ == '__main__':
     # pred_data = generate_prediction_data(8477492,8471469,x_scaler)
 
     # GL vs PR
-    # pred_data = generate_prediction_data(8476455,8471469,x_scaler)
+    # pred_data = generate_prediction_data(8477492,8471469,x_scaler)
 
     # early_stop = EarlyStopping(monitor='acc',min_delta=0.001)
     # tensorboard = TensorBoard(log_dir='./logs', histogram_freq=0,write_graph=True)
-    model.fit(x_std,y_train,epochs=100,batch_size=32,verbose=1)
-    print(model.evaluate(x_t_std,y_test,batch_size=32))
+    # model.fit(x_std,y_train,epochs=100,batch_size=32,verbose=1)
+    # print(model.evaluate(x_t_std,y_test,batch_size=32))
+    # plot_kde(model.predict(pred_data))
+
+    # players = [8476887, 8475793, 8478042, 8474600, 8475176]
+    goalie = 8473541
+
+    ff_data = generate_prediction_data(8476887,goalie,x_scaler)
+    rj_data = generate_prediction_data(8475793,goalie,x_scaler)
+    va_data = generate_prediction_data(8478042,goalie,x_scaler)
+    josi_data = generate_prediction_data(8474600,goalie,x_scaler)
+    re_data = generate_prediction_data(8475176,goalie,x_scaler)
+
+    plot_kde(model.predict(ff_data),'Filip Forsberg vs Jonathan Bernier','Goals','ff_vs_jb')
+    plot_kde(model.predict(rj_data),'Ryan Johansen vs Jonathan Bernier','Goals','rj_vs_jb')
+    plot_kde(model.predict(va_data),'Viktor Arvidsson vs Jonathan Bernier','Goals','va_vs_jb')
+    plot_kde(model.predict(josi_data),'Roman Josi vs Jonathan Bernier','Goals','josi_vs_jb')
+    plot_kde(model.predict(re_data),'Ryan Ellis vs Jonathan Bernier','Goals','re_vs_jb')
 
     # gs = GridSearchCV(estimator=model,param_grid=param_grid,n_jobs=-1,verbose=1,scoring=['acc','f1_score'])
     # gs.fit(x_std,y_train)

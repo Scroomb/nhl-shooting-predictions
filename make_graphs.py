@@ -140,7 +140,7 @@ def load_shots_goals(year):
     goals.x = goals.x.abs()
     return shots,goals
 
-def plot_kde(density,player='test',type='test'):
+def plot_kde(density,player='test',type='test',save='test_vs_test'):
     xx,yy = np.meshgrid(np.arange(0,100,1),np.arange(-42,43,1))
     xy = np.vstack([xx.ravel(),yy.ravel()])
     plt.pcolormesh(xx,yy,density.reshape(xx.shape),cmap=plt.cm.jet)
@@ -157,11 +157,12 @@ def plot_kde(density,player='test',type='test'):
     plt.gca().add_patch(circle1)
     plt.gca().add_patch(circle2)
     plt.gca().add_patch(goal)
-    plt.show()
+    plt.savefig('figs/'+save+'.png')
+    print(save, ' saved')
 
 if __name__ == '__main__':
-    db = _init_mongo()
-    coll = db.year_2017
+    # db = _init_mongo()
+    # coll = db.year_2017
     # coll = db.players_year_20172018
     # shots = get_shooter_coords(db,coll)
     # shots = pd.read_csv('data/2017_shooters.csv')
@@ -173,7 +174,7 @@ if __name__ == '__main__':
     # plot_heat_map(df_2010_scoring)
     # df_2010_shots = get_shot_coords(coll)
 
-    # shots, goals = load_shots_goals(2017)
+    shots, goals = load_shots_goals(2017)
     #
     # # # Nathan MacKinnon 8477492
     # nm_shots, nm_goals = player_shots_goals(8477492,shots,goals)
