@@ -46,7 +46,7 @@ Lets also look at the Predators' starting lineup vs the Avalanche's starting goa
 ##### Ryan Ellis(D) vs Jonathan Bernier
 ![RE vs JB](/figs/re_vs_jb.png)
 
-This model can be used to set defensive
+This model can be used to set defensive strategy as well.  Against Jonathan Bernier, the Nashville defense should focus on shooting from their left side.  This could inform the Avalanche defenders to attempt to prevent the puck from getting to that area, or to focus on blocking shots from that area.
 
 ### Future Considerations
  * Allow for additional game factors such as score difference and period
