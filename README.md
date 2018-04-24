@@ -1,4 +1,4 @@
-# Predicting Optimal Shooting Locations
+# Predicting Optimal NHL Shooting Locations
 
 ### Overview
 Modern hockey advanced statistics focus on quantities of shots for a given team.  This can provide some interesting metrics, but there is no way to quantify where each shot is coming from.  A shot that occurs right next to the goal carries the same weight as a shot that occurs at center ice.  Luckily, since 2010, the NHL started tracking in game events on an XY coordinate system.  Using this data for a given season, can optimal shooting locations be predicted?
