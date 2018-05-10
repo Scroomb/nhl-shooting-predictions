@@ -2,7 +2,7 @@ from sklearn.neighbors import KernelDensity
 from sklearn.model_selection import GridSearchCV
 import numpy as np
 import pandas as pd
-from make_graphs import player_shots_goals, goalie_shots_goals, load_shots_goals
+from make_graphs import player_shots_goals, goalie_shots_goals, load_shots_goals, plot_kde
 import pymongo
 import pickle as pkl
 import bson
