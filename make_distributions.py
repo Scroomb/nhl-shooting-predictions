@@ -149,12 +149,12 @@ def gen_block_dist(team,blocked):
             print(point)
             coords = t.in_triangle_coords(point)
             if coords is None:
-                out_blk_dist[x][y] = 0.0
+                out_blk_dist[y][x] = 0.0
             else:
                 block_val=0
                 for coord in coords:
                     block_val += blk_dist[coord[0]][coord[1]]
-                out_blk_dist[x][y]=block_val
+                out_blk_dist[y][x]=block_val
     return out_blk_dist
 
 # if __name__ == '__main__':
