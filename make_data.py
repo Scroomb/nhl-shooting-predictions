@@ -105,10 +105,10 @@ def scale_transform_split(td):
 if __name__ == '__main__':
     db = _init_mongo()
     shots, goals = load_shots_goals(2017)
-    # nm_shots, nm_goals = player_shots_goals(8477492,shots,goals)
+    nm_shots, nm_goals = player_shots_goals(8477492,shots,goals)
 
-    td = make_data(db,shots,goals)
-    np.savetxt('data/2017_shots_goals_goalie.csv',delimiter=',')
+    # td = make_data(db,shots,goals)
+    # np.savetxt('data/2017_shots_goals_goalie.csv',delimiter=',')
     # td = np.genfromtxt('data/2017_total_data.csv',delimiter=',')
     # x_std,x_t_std,y_train,y_test,x_scaler = scale_transform_split(td)
     # pred_data = generate_prediction_data(8477492,8471469,x_scaler)

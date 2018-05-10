@@ -29,6 +29,24 @@ def get_shot_coords(coll):
             shots_df = shots_df.append(shots)
     return shots_df
 
+def get_missed_coords(coll):
+    missed_df = pd.DataFrame()
+    for gmid in coll.distinct('gamePk'):
+        all_plays = coll.find_one({'gamePk':gmid})['liveData']['plays']['allPlays']
+        shots = [play['coordinates'] for play in all_plays if play['result']['eventTypeId']=='MISSED_SHOT']
+        if shots:
+            missed_df = missed_df.append(shots)
+    return missed_df
+
+def get_blocked_coords(coll,gmid):
+    blocked_df = pd.DataFrame()
+    # for gmid in coll.distinct('gamePk'):
+    all_plays = coll.find_one({'gamePk':gmid})['liveData']['plays']['allPlays']
+    shots = [play['coordinates'] for play in all_plays if play['result']['eventTypeId']=='BLOCKED_SHOT']
+    if shots:
+        blocked_df = blocked_df.append(shots)
+    return blocked_df
+
 def get_scorer_coords(db,coll):
     scorers = pd.DataFrame()
     for gmid in coll.distinct('gamePk'):
@@ -64,6 +82,33 @@ def get_shooter_coords(db,coll):
                         shooters = shooters.append([coords])
 
     return shooters
+
+# def get_all_shot_coords(db,coll):
+#     shooters = pd.DataFrame()
+#     for gmid in coll.distinct('gamePk'):
+#         all_plays = coll.find_one({'gamePk':gmid})['liveData']['plays']['allPlays']
+#         home = coll.find_one({'gamePk':gmid})['gameData']['teams']['home']['id']
+#         away = coll.find_one({'gamePk':gmid})['gameData']['teams']['away']['id']
+#         for play in all_plays:
+#             if play['result']
+#             if play['about']['periodType']!='SHOOTOUT':
+#                 if 'SHOT' in play['result']['eventTypeId'] and bool(play['coordinates']):
+#                     coords = play['coordinates']
+#                     coord['type'] = play['result']['eventType']
+#                     coords['period'] = play['about']['period']
+#                     if play['team']['id']==home:
+#                         coord['h_a'] = 'home'
+#                     elif play['team']['id']==away:
+#                         coord['h_a'] = 'away'
+#                     for player in play['players']:
+#                         if player['playerType']=='Shooter' and db.players.find_one({'id':player['player']['id']})['primaryPosition']['code']!='G':
+#                             coords['shooter']=int(player['player']['id'])
+#                         if player['playerType']=='Goalie':
+#                             coords['goalie']=int(player['player']['id'])
+#                     if all(pos in coords.keys() for pos in ['goalie','shooter','x','y']):
+#                         shooters = shooters.append([coords])
+#
+#     return shooters
 
 
 def plot_heat_map(df,color='bk'):
@@ -153,14 +198,15 @@ def plot_kde(density,player='test',type='test',save='test_vs_test'):
                     edgecolor='black', facecolor=(0, 0, 0, .0001))
     circle2 = plt.Circle((69,22),radius=15,clip_on=False, zorder=10, linewidth=1,
                     edgecolor='black', facecolor=(0, 0, 0, .0001))
-    goal = plt.Rectangle((89,-3),2,6,edgecolor='black', facecolor=(0,0,0,.0001))
+    goal = plt.Rectangle((89,-3),44/12,6,edgecolor='black', facecolor=(0,0,0,.0001))
     plt.gca().add_patch(circle1)
     plt.gca().add_patch(circle2)
     plt.gca().add_patch(goal)
-    plt.savefig('figs/'+save+'.png')
-    print(save, ' saved')
+    # plt.savefig('figs/'+save+'.png')
+    # print(save, ' saved')
+    plt.show()
 
-if __name__ == '__main__':
+# if __name__ == '__main__':
     # db = _init_mongo()
     # coll = db.year_2017
     # coll = db.players_year_20172018
@@ -174,7 +220,7 @@ if __name__ == '__main__':
     # plot_heat_map(df_2010_scoring)
     # df_2010_shots = get_shot_coords(coll)
 
-    shots, goals = load_shots_goals(2017)
+    # shots, goals = load_shots_goals(2017)
     #
     # # # Nathan MacKinnon 8477492
     # nm_shots, nm_goals = player_shots_goals(8477492,shots,goals)

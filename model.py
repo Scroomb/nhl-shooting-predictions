@@ -18,27 +18,6 @@ def _init_mongo():
     db = client.hockey
     return db
 
-def define_nn_mlp_model(num_neurons_in_layer_1 = 20,num_neurons_in_layer_2 = 20,num_neurons_in_layer_3=20,lr=0.001):
-    model = Sequential()
-    num_inputs = X_train.shape[1]
-    num_classes = y_train_ohe.shape[1]
-    model.add(Dense(units=num_neurons_in_layer_1,
-                    input_dim=num_inputs,
-                    kernel_initializer='glorot_uniform',
-                    activation='relu')) # is tanh the best activation to use here?
-    # maybe add another dense layer here?  How about some deep learning?!?
-    model.add(Dense(units=num_neurons_in_layer_2,
-                    input_dim=num_inputs,
-                    kernel_initializer='glorot_uniform',
-                    activation='relu'))
-    model.add(Dense(units=num_classes,
-                    input_dim=num_neurons_in_layer_3,
-                    kernel_initializer='glorot_uniform',
-                    activation='softmax')) # keep softmax as last layer
-    sgd = SGD(lr=lr, decay=1e-7, momentum=.9) # using stochastic gradient descent (keep)
-    model.compile(loss='categorical_crossentropy', optimizer=sgd, metrics=["accuracy"] ) # (keep)
-    return model
-
 def define_model(input_size,nuerons_layer_1=100,neurons_layer_2=100,neurons_layer_3=100,
                 init_mode='normal',dropout_rate=0.5,activation='relu',final_activation='sigmoid',
                 optimizer='adagrad'):

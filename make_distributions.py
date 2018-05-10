@@ -11,6 +11,7 @@ from make_graphs import player_shots_goals, goalie_shots_goals, load_shots_goals
 import pymongo
 import pickle as pkl
 import bson
+import triangle as t
 
 def _init_mongo():
     client = pymongo.MongoClient()
@@ -142,42 +143,59 @@ def make_data(db,shots,goals):
 
     return td
 
+def gen_block_dist(team,blocked,distribution):
+    blk = blocked[blocked['d_team']==team][['x','y']].values
+    # blk_dist = make_shot_density(blk,20).reshape(100,85)
+    blk_dist = distribution
+    out_blk_dist = np.zeros(blk_dist.shape)
+    for x in range(100):
+        for y in range(85):
+            point = np.array([[x],[y]])
+            print(point)
+            coords = t.in_triangle_coords(point)
+            if coords is None:
+                out_blk_dist[x][y] = 0.0
+            else:
+                block_val=0
+                for coord in coords:
+                    block_val += blk_dist[coord[0]][coord[1]]
+                out_blk_dist[x][y]=block_val
+    return out_blk_dist
 
-
-if __name__ == '__main__':
-    db = _init_mongo()
-    shots, goals = load_shots_goals(2017)
-    # goals = pd.read_csv('data/2017_goals.csv')
-    # shots = pd.read_csv('data/2017_shots.csv')
-    nm_shots, nm_goals = player_shots_goals(8477492,shots,goals)
-    # pr_shots, pr_goals = goalie_shots_goals(8471469,shots,goals)
-    #
-    # goal_d = make_shot_density(nm_goals[['x','y']].values)
-    # save_d = 1 - make_shot_density(pr_goals[['x','y']].values)
-
-    # feature = np.concatenate((goal_d.reshape(1,goal_d.shape[0]),save_d.reshape(1,save_d.shape[0])),axis=1)
-
-    # generate_all_distributions(shots,goals)
-
-    td = make_data(db,shots,goals)
-    #
-    # td_x = td[:,:-1]
-    # td_y = td[:,-1]
-    #
-    # sm = SMOTE(kind='regular')
-    #
-    # x_res, y_res = sm.fit_sample(td_x,td_y)
-
-    x_train,x_test,y_train,y_test = train_test_split(x_res,y_res,test_size=.2)
-    x_scaler = StandardScaler()
-
-    x_std = x_scaler.fit_transform(x_train)
-    x_t_std = x_scaler.transform(x_test)
-
-    #
-    
-
-    model.fit(x_std, y_train,
-              epochs=50,
-              batch_size=256)
-    score = model.evaluate(x_t_std, y_test, batch_size=256)
+# if __name__ == '__main__':
+#     db = _init_mongo()
+#     shots, goals = load_shots_goals(2017)
+#     # goals = pd.read_csv('data/2017_goals.csv')
+#     # shots = pd.read_csv('data/2017_shots.csv')
+#     nm_shots, nm_goals = player_shots_goals(8477492,shots,goals)
+#     # pr_shots, pr_goals = goalie_shots_goals(8471469,shots,goals)
+#     #
+#     # goal_d = make_shot_density(nm_goals[['x','y']].values)
+#     # save_d = 1 - make_shot_density(pr_goals[['x','y']].values)
+#
+#     # feature = np.concatenate((goal_d.reshape(1,goal_d.shape[0]),save_d.reshape(1,save_d.shape[0])),axis=1)
+#
+#     # generate_all_distributions(shots,goals)
+#
+#     td = make_data(db,shots,goals)
+#     #
+#     # td_x = td[:,:-1]
+#     # td_y = td[:,-1]
+#     #
+#     # sm = SMOTE(kind='regular')
+#     #
+#     # x_res, y_res = sm.fit_sample(td_x,td_y)
+#
+#     x_train,x_test,y_train,y_test = train_test_split(x_res,y_res,test_size=.2)
+#     x_scaler = StandardScaler()
+#
+#     x_std = x_scaler.fit_transform(x_train)
+#     x_t_std = x_scaler.transform(x_test)
+#
+#     #
+#
+#
+#     model.fit(x_std, y_train,
+#               epochs=50,
+#               batch_size=256)
+#     score = model.evaluate(x_t_std, y_test, batch_size=256)
