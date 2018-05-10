@@ -141,7 +141,7 @@ def make_data(db,shots,goals):
 def gen_block_dist(team,blocked):
     blk = blocked[blocked['d_team']==team][['x','y']].values
     blk_dist = make_shot_density(blk,20).reshape(100,85)
-    blk_dist = distribution
+#    blk_dist = distribution
     out_blk_dist = np.zeros(blk_dist.shape)
     for x in range(100):
         for y in range(85):
@@ -157,7 +157,10 @@ def gen_block_dist(team,blocked):
                 out_blk_dist[y][x]=block_val
     return out_blk_dist
 
-# if __name__ == '__main__':
+if __name__ == '__main__':
+    blocks = pd.read_csv('data/2017_blocked.csv')
+    team = 52
+    out_block = gen_block_dist(team,blocks)
 #     db = _init_mongo()
 #     shots, goals = load_shots_goals(2017)
 #     # goals = pd.read_csv('data/2017_goals.csv')
