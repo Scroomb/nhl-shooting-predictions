@@ -1,10 +1,4 @@
-from imblearn.over_sampling import SMOTE
 from sklearn.neighbors import KernelDensity
-from sklearn.model_selection import GridSearchCV
-from keras.models import Sequential
-from keras.layers import Dense, Activation, Dropout
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler
 import numpy as np
 import pandas as pd
 from make_graphs import player_shots_goals, goalie_shots_goals, load_shots_goals
