@@ -138,9 +138,9 @@ def make_data(db,shots,goals):
 
     return td
 
-def gen_block_dist(team,blocked,distribution):
+def gen_block_dist(team,blocked):
     blk = blocked[blocked['d_team']==team][['x','y']].values
-    # blk_dist = make_shot_density(blk,20).reshape(100,85)
+    blk_dist = make_shot_density(blk,20).reshape(100,85)
     blk_dist = distribution
     out_blk_dist = np.zeros(blk_dist.shape)
     for x in range(100):
