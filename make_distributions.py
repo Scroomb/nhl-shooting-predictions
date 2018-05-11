@@ -173,7 +173,7 @@ if __name__ == '__main__':
     db = _init_mongo()
     blocks = pd.read_csv('data/2017_blocked.csv')
 
-
+    gen_all_blocks(2017,blocks,db)
 
 
 #     shots, goals = load_shots_goals(2017)
