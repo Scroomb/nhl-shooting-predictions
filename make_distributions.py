@@ -28,6 +28,11 @@ def save_density_to_db(year,player,density,dist_type,position):
     else:
         coll.update_one({'player_id':player},{'$push':{dist_type:y}})
 
+def save_block_to_db(year,team,density,db):
+    coll = db['team']
+    y = bson.binary.Binary(pkl.dumps(density,protocol=2))
+    coll.update_one({'team':team},{'$push':{'distribution':{'year_'+year:y}}},upsert=True)
+
 def retrieve_density(db,player,position,dist_type,year=2017):
     coll = db['players_year_'+str(year)+str(year+1)]
     if position == 'goalie':
@@ -141,27 +146,34 @@ def make_data(db,shots,goals):
 def gen_block_dist(team,blocked):
     blk = blocked[blocked['d_team']==team][['x','y']].values
     blk_dist = make_shot_density(blk,20).reshape(100,85)
-  #  blk_dist = distribution
-    out_blk_dist = []
-    for y in range(85):
-        for x in range(100):
+    # blk_dist = distribution
+    out_blk_dist = np.zeros(blk_dist.shape)
+    for x in range(100):
+        for y in range(85):
             point = np.array([[x],[y]])
-            print(point)
+            # print(point)
             coords = t.in_triangle_coords(point)
             if coords is None:
-                out_blk_dist.append(0.0)
+                out_blk_dist[y][x] = 0.0
             else:
                 block_val=0
                 for coord in coords:
                     block_val += blk_dist[coord[0]][coord[1]]
-                out_blk_dist.append(block_val)
-    return out_blk_dist
+                out_blk_dist[y][x]=block_val
+    return out_blk_dist.T
+
+def gen_all_blocks(year,blocks,db):
+    for team in blocked['d_team'].unique():
+        out_block = gen_block_dist(team,blocks)
+        save_block_to_db(str(year),str(team),out_block,db)
 
 if __name__ == '__main__':
+    db = _init_mongo()
     blocks = pd.read_csv('data/2017_blocked.csv')
-    team = 52
-    out_block = gen_block_dist(team,blocks)
-#     db = _init_mongo()
+
+
+
+
 #     shots, goals = load_shots_goals(2017)
 #     # goals = pd.read_csv('data/2017_goals.csv')
 #     # shots = pd.read_csv('data/2017_shots.csv')
