@@ -149,8 +149,8 @@ def gen_block_dist(team,blocked):
     # blk_dist = distribution
     out_blk_dist = np.zeros(blk_dist.shape)
     for x in range(100):
+        print('Starting: ',x)
         for y in range(85):
-            print('Starting: ',x)
             point = np.array([[x],[y]])
             # print(point)
             coords = t.in_triangle_coords(point)
@@ -161,7 +161,7 @@ def gen_block_dist(team,blocked):
                 for coord in coords:
                     block_val += blk_dist[coord[0]][coord[1]]
                 out_blk_dist[x][y]=block_val
-            print('Completed: ',x)
+        print('Completed: ',x)
     return out_blk_dist.T
 
 def gen_all_blocks(year,blocks,db):
