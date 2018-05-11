@@ -165,7 +165,7 @@ def gen_block_dist(team,blocked):
     return out_blk_dist.T
 
 def gen_all_blocks(year,blocks,db):
-    for team in blocked['d_team'].unique():
+    for team in blocks['d_team'].unique():
         out_block = gen_block_dist(team,blocks)
         save_block_to_db(str(year),str(team),out_block,db)
 
@@ -174,6 +174,7 @@ if __name__ == '__main__':
     blocks = pd.read_csv('data/2017_blocked.csv')
 
     gen_all_blocks(2017,blocks,db)
+
 
 
 #     shots, goals = load_shots_goals(2017)
