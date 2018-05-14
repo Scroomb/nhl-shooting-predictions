@@ -108,7 +108,7 @@ if __name__ == '__main__':
 
     x_std,x_t_std,y_train,y_test,x_scaler = scale_transform_split(td)
     model = define_model(7)
-    model.fit(x_std,y_train,epochs=50)
+    model.fit(x_std,y_train,epochs=5)
     # model = load_model('trained_model.h5')
 
     # model = KerasClassifier(build_fn=define_model,verbose=1,input_size=4,epochs=100,batch_size=32)

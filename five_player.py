@@ -29,19 +29,20 @@ def get_player_id(player_name):
     p_id = db['players'].find_one({'fullName':player_name},{'id':1})['id']
     return str(p_id)
 
-def single_row(db,row,goal,miss,save):
+def single_row(db,row,p_type,goal_den,shot_den,miss_den,d_team,year=2017):
     goalie = str(int(row['goalie']))
-    x = int(row['x'])
     scorer = str(int(row[p_type]))
+    # team = str(int(row[d_team]))
+    x = int(row['x'])
     y = int(row['y'])+42
-    g_g_density = 1-retrieve_density(db,goalie,'goalie','save_dist').reshape(85,100)
-    p_g_density = retrieve_density(db,scorer,'player','goal_dist').reshape(85,100)
-    g_s_density = retrieve_density(db,goalie,'goalie','shot_dist').reshape(85,100)
-    p_s_density = retrieve_density(db,scorer,'player','shot_dist').reshape(85,100)
+    g_g_density = 1-retrieve_player_density(db,goalie,'goalie','save_dist').reshape(85,100) #goalie save
+    t_b_density = retrieve_team_density(db,d_team,year)
     g_g_den = g_g_density[y][x]
-    p_g_den = p_g_density[y][x]
-    p_s_den = p_s_density[y][x]  # Use player shot density?
-    return np.append(row,[p_g_den,g_g_den,p_s_den])
+    p_g_den = goal_den[y][x]
+    p_s_den = shot_den[y][x]
+    p_m_den = miss_den[y][x]
+    t_b_den = t_b_density[y][x]
+    return np.append(row,[p_g_den,g_g_den,p_s_den,p_m_den,t_b_den])
 
 if __name__ == '__main__':
     goals,shots,missed = load_data(2017)
