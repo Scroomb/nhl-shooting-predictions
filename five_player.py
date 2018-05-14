@@ -31,7 +31,7 @@ def get_player_id(player_name):
 
 def single_row(db,row,p_type,goal_den,shot_den,miss_den,d_team,year=2017):
     goalie = str(int(row['goalie']))
-    scorer = str(int(row[p_type]))
+    # scorer = str(int(row[p_type]))
     # team = str(int(row[d_team]))
     x = int(row['x'])
     y = int(row['y'])+42
@@ -44,7 +44,45 @@ def single_row(db,row,p_type,goal_den,shot_den,miss_den,d_team,year=2017):
     t_b_den = t_b_density[y][x]
     return np.append(row,[p_g_den,g_g_den,p_s_den,p_m_den,t_b_den])
 
+def generate_prediction_data(goal_den,shot_den,miss_den,goalie_id,d_team,scaler):
+    xx,yy = np.meshgrid(np.arange(0,100,1),np.arange(-42,43,1))
+    xy = np.vstack([xx.ravel(),yy.ravel()])
+
+    # shooter = int(shooter_id)
+    goalie = int(goalie_id)
+    # shooter = np.full((8500,1),shooter)
+    # goalie = np.full((8500,1),goalie)
+
+    # unseen = np.concatenate((shooter,goalie,xy.T),axis=1)
+    # unseen = pd.DataFrame(unseen,columns=['scorer','goalie','x','y'])
+    unseen = pd.DataFrame(xy.T,columns=['x',y'])
+
+    unseen_data = []
+    for row in unseen.iterrows():
+        row_d = single_row(db,row[1],'scorer',goal_den,shot_den,miss_den,d_team)
+        unseen_data.append(row_d)
+    unseen_data = np.array(unseen_data)
+    # unseen_data_for_model = unseen_data[:,2:]
+    return scaler.transform(unseen_data)
+
+def scale_transform_split(td):
+    td_x = td[:,:-1]
+    td_y = td[:,-1]
+    sm = SMOTE(kind='regular')
+    x_res, y_res = sm.fit_sample(td_x,td_y)
+
+    x_train,x_test,y_train,y_test = train_test_split(x_res,y_res,test_size=.2)
+    x_scaler = StandardScaler()
+
+    x_std = x_scaler.fit_transform(x_train)
+    x_t_std = x_scaler.transform(x_test)
+    return x_std,x_t_std,y_train,y_test,x_scaler
+
 if __name__ == '__main__':
+    db = _init_mongo()
+    td = np.genfromtxt('data/2017_g_s_m_b.csv',delimiter=',')
+    x_std,x_t_std,y_train,y_test,x_scaler = scale_transform_split(td)
+
     goals,shots,missed = load_data(2017)
     lw = get_player_id('Gabriel Landeskog')
     c = get_player_id('Nathan MacKinnon')
@@ -61,3 +99,5 @@ if __name__ == '__main__':
     den_5_g = make_shot_density(goals_5[['x','y']])
     den_5_s = make_shot_density(shots_5[['x','y']])
     den_5_m = make_shot_density(missed_5[['x','y']])
+
+    avs_top_5 = generate_prediction_data(den_5_g,den_5_s,den_5_m,8471469,52,x_scaler)
