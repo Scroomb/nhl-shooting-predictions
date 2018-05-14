@@ -48,7 +48,7 @@ def scale_transform_split(td):
     x_t_std = x_scaler.transform(x_test)
     return x_std,x_t_std,y_train,y_test,x_scaler
 
-def generate_prediction_data(shooter_id,goalie_id,scaler):
+def generate_prediction_data(shooter_id,goalie_id,d_team,scaler):
     xx,yy = np.meshgrid(np.arange(0,100,1),np.arange(-42,43,1))
     xy = np.vstack([xx.ravel(),yy.ravel()])
 
@@ -62,27 +62,37 @@ def generate_prediction_data(shooter_id,goalie_id,scaler):
 
     unseen_data = []
     for row in unseen.iterrows():
-        row_d = single_row(db,row[1],'scorer')
+        row_d = single_row(db,row[1],'scorer',d_team)
         unseen_data.append(row_d)
     unseen_data = np.array(unseen_data)
     unseen_data_for_model = unseen_data[:,2:]
     return scaler.transform(unseen_data_for_model)
 
-def single_row(db,row,p_type):
+def single_row(db,row,p_type,d_team,year=2017):
     goalie = str(int(row['goalie']))
-    x = int(row['x'])
     scorer = str(int(row[p_type]))
+    # team = str(int(row[d_team]))
+    x = int(row['x'])
     y = int(row['y'])+42
-    g_g_density = 1-retrieve_density(db,goalie,'goalie','save_dist').reshape(85,100)
-    p_g_density = retrieve_density(db,scorer,'player','goal_dist').reshape(85,100)
-    g_s_density = retrieve_density(db,goalie,'goalie','shot_dist').reshape(85,100)
-    p_s_density = retrieve_density(db,scorer,'player','shot_dist').reshape(85,100)
+    g_g_density = 1-retrieve_player_density(db,goalie,'goalie','save_dist').reshape(85,100) #goalie save
+    p_g_density = retrieve_player_density(db,scorer,'player','goal_dist').reshape(85,100) #player goal
+    # g_s_density = retrieve_player_density(db,goalie,'goalie','shot_dist').reshape(85,100) #goalie
+    p_s_density = retrieve_player_density(db,scorer,'player','shot_dist').reshape(85,100) #player shot
+    p_m_density = retrieve_player_density(db,scorer,'player','missed_dist').reshape(85,100)
+    t_b_density = retrieve_team_density(db,d_team,year)
     g_g_den = g_g_density[y][x]
     p_g_den = p_g_density[y][x]
-    # p_s_den = p_s_density[y][x]  # Use player shot density?
-    return np.append(row,[p_g_den,g_g_den])
+    p_s_den = p_s_density[y][x]
+    p_m_den = p_m_density[y][x]
+    t_b_den = t_b_density[y][x]
+    return np.append(row,[p_g_den,g_g_den,p_s_den,p_m_den,t_b_den])
 
-def retrieve_density(db,player,position,dist_type,year=2017):
+def retrieve_team_density(db,team,year):
+    coll = db['team']
+    y = coll.find_one({'team':str(team)})['distribution'][0]['year_'+str(year)]
+    return pkl.loads(y)
+
+def retrieve_player_density(db,player,position,dist_type,year=2017):
     coll = db['players_year_'+str(year)+str(year+1)]
     if position == 'goalie':
         y = coll.find_one({'player_id':player})[dist_type][0]
@@ -92,12 +102,13 @@ def retrieve_density(db,player,position,dist_type,year=2017):
 
 if __name__ == '__main__':
     db = _init_mongo()
-    td = np.genfromtxt('data/2017_total_data.csv',delimiter=',')
-    td = np.genfromtxt('data/2017_shots_goals_goalie.csv',delimiter=',')
+    td = np.genfromtxt('data/2017_g_s_m_b.csv',delimiter=',')
+    # td = np.genfromtxt('data/2017_total_data.csv',delimiter=',')
+    # td = np.genfromtxt('data/2017_shots_goals_goalie.csv',delimiter=',')
 
     x_std,x_t_std,y_train,y_test,x_scaler = scale_transform_split(td)
     # model = define_model(4)
-    model = load_model('trained_model.h5')
+    # model = load_model('trained_model.h5')
 
     # model = KerasClassifier(build_fn=define_model,verbose=1,input_size=4,epochs=100,batch_size=32)
     # param_grid = dict(nuerons_layer_1=[25,50,100,500],neurons_layer_2=[25,50,100,500])
@@ -110,7 +121,7 @@ if __name__ == '__main__':
     # param_grid = dict(activation=hidden_activation,final_activation=final_activation,optimizer=optimizer)
 
     # NM vs PR
-    # pred_data = generate_prediction_data(8477492,8471469,x_scaler)
+    # pred_data = generate_prediction_data(8477492,8471469,18,x_scaler)
 
     # GL vs PR
     # pred_data = generate_prediction_data(8477492,8471469,x_scaler)
@@ -122,19 +133,19 @@ if __name__ == '__main__':
     # plot_kde(model.predict(pred_data))
 
     # players = [8476887, 8475793, 8478042, 8474600, 8475176]
-    goalie = 8473541
-
-    ff_data = generate_prediction_data(8476887,goalie,x_scaler)
-    rj_data = generate_prediction_data(8475793,goalie,x_scaler)
-    va_data = generate_prediction_data(8478042,goalie,x_scaler)
-    josi_data = generate_prediction_data(8474600,goalie,x_scaler)
-    re_data = generate_prediction_data(8475176,goalie,x_scaler)
-
-    plot_kde(model.predict(ff_data),'Filip Forsberg vs Jonathan Bernier','Goals','ff_vs_jb')
-    plot_kde(model.predict(rj_data),'Ryan Johansen vs Jonathan Bernier','Goals','rj_vs_jb')
-    plot_kde(model.predict(va_data),'Viktor Arvidsson vs Jonathan Bernier','Goals','va_vs_jb')
-    plot_kde(model.predict(josi_data),'Roman Josi vs Jonathan Bernier','Goals','josi_vs_jb')
-    plot_kde(model.predict(re_data),'Ryan Ellis vs Jonathan Bernier','Goals','re_vs_jb')
+    # goalie = 8473541
+    #
+    # ff_data = generate_prediction_data(8476887,goalie,x_scaler)
+    # rj_data = generate_prediction_data(8475793,goalie,x_scaler)
+    # va_data = generate_prediction_data(8478042,goalie,x_scaler)
+    # josi_data = generate_prediction_data(8474600,goalie,x_scaler)
+    # re_data = generate_prediction_data(8475176,goalie,x_scaler)
+    #
+    # plot_kde(model.predict(ff_data),'Filip Forsberg vs Jonathan Bernier','Goals','ff_vs_jb')
+    # plot_kde(model.predict(rj_data),'Ryan Johansen vs Jonathan Bernier','Goals','rj_vs_jb')
+    # plot_kde(model.predict(va_data),'Viktor Arvidsson vs Jonathan Bernier','Goals','va_vs_jb')
+    # plot_kde(model.predict(josi_data),'Roman Josi vs Jonathan Bernier','Goals','josi_vs_jb')
+    # plot_kde(model.predict(re_data),'Ryan Ellis vs Jonathan Bernier','Goals','re_vs_jb')
 
     # gs = GridSearchCV(estimator=model,param_grid=param_grid,n_jobs=-1,verbose=1,scoring=['acc','f1_score'])
     # gs.fit(x_std,y_train)

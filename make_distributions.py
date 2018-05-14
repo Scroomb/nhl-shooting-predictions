@@ -41,6 +41,27 @@ def retrieve_density(db,player,position,dist_type,year=2017):
         y = coll.find_one({'player_id':player})[dist_type][0]
     return pkl.loads(y)
 
+def generate_missed_distributions(missed):
+    shooters = []
+    for x in missed.shooter.unique():
+        shooters.append(('shooter',x))
+    shooters = np.array(shooters)
+    for shooter in shooters:
+    # for i in range(647,721):
+        # scorer = scorers[i]
+        print(shooter[1])
+        missed_p = missed[missed.shooter==int(shooter[1])]
+        if missed_p.shape[0]<=10:
+            continue
+        else:
+            m_cv = 10
+
+        if 'missed_dist' not in db.players_year_20172018.find_one({'player_id':shooter[1]},{'missed_dist':1}).keys():
+            density = make_shot_density(missed_p[['x','y']].values,m_cv)
+            save_density_to_db('players_year_20172018',shooter[1],density,'missed_dist',shooter[0])
+        else:
+            print(shooter[1], ' shooter missed dist exists')
+
 def generate_all_distributions(shots,goals):
     goalies = []
     for x in goals.goalie.unique():
@@ -110,7 +131,7 @@ def single_row(db,row,p_type):
     g_p_den = p_density[y][x]
     return np.append(row,[g_p_den,g_g_den])
 
-def make_data(db,shots,goals):
+def make_data(db,shots,goals,missed):
     coll = db['players_year_20172018']
     goal_data = []
 
@@ -169,13 +190,36 @@ def gen_all_blocks(year,blocks,db):
         out_block = gen_block_dist(team,blocks)
         save_block_to_db(str(year),str(team),out_block,db)
 
+def load_data(year):
+    goals = pd.read_csv('data/'+str(year)+'_goals.csv')
+    shots = pd.read_csv('data/'+str(year)+'_shots.csv')
+    missed = pd.read_csv('data/'+str(year)+'_missed.csv')
+    return goals,shots,missed
+
+def get_5_player_data(rw,c,lw,d1,d2,goals,shots,missed):
+    list_of_players = [rw,c,lw,d1,d2]
+    goals_5 = goals[goals['scorer'].isin(list_of_players)]
+    shots_5 = shots[shots['shooter'].isin(list_of_players)]
+    missed_5 = missed[missed['shooter'].isin(list_of_players)]
+    return goals_5,shots_5,missed_5
+
+def get_player_id(player_name):
+    db = _init_mongo()
+    p_id = db['players'].find_one({'fullName':player_name},{'id':1})['id']
+    return p_id
+
 if __name__ == '__main__':
     db = _init_mongo()
-    blocks = pd.read_csv('data/2017_blocked.csv')
+    # blocks = pd.read_csv('data/2017_blocked.csv')
+    goals,shots,missed = load_data(2017)
+    # gen_all_blocks(2017,blocks,db)
+    # lw = get_player_id('Gabriel Landeskog')
+    # c = get_player_id('Nathan MacKinnon')
+    # rw = get_player_id('Mikko Rantanen')
+    # d1 = get_player_id('Tyson Barrie')
+    # d2 = get_player_id('Nikita Zadorov')
 
-    gen_all_blocks(2017,blocks,db)
-
-
+    generate_missed_distributions(missed)
 
 #     shots, goals = load_shots_goals(2017)
 #     # goals = pd.read_csv('data/2017_goals.csv')

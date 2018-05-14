@@ -21,6 +21,7 @@ def get_all_shot_coords(db,coll):
     misses = pd.DataFrame()
     goals = pd.DataFrame()
     for gmid in coll.distinct('gamePk'):
+    # for gmid in [2017020001]:
         print(gmid)
         all_plays = coll.find_one({'gamePk':gmid})['liveData']['plays']['allPlays']
         home = coll.find_one({'gamePk':gmid})['gameData']['teams']['home']['id']
@@ -69,7 +70,11 @@ def get_all_shot_coords(db,coll):
                         if player['playerType']=='Blocker':
                             coords['defender']=int(player['player']['id'])
                     if play_type =='MISSED_SHOT':
-                        coords['m_team']=play['team']['id']
+                        shot_team=play['team']['id']
+                        if shot_team == home:
+                            coords['d_team']=away
+                        else:
+                            coords['d_team']=home
                         if all(pos in coords.keys() for pos in misses.keys()):
                             misses = misses.append([coords])
                     elif play_type =='BLOCKED_SHOT':
@@ -77,9 +82,20 @@ def get_all_shot_coords(db,coll):
                         if all(pos in coords.keys() for pos in blocks.keys()):
                             blocks = blocks.append([coords])
                     elif play_type =='SHOT':
+                        shot_team=play['team']['id']
+                        if shot_team == home:
+                            coords['d_team']=away
+                        else:
+                            coords['d_team']=home
                         if all(pos in coords.keys() for pos in shots.keys()):
+
                             shots = shots.append([coords])
                     elif play_type =='GOAL':
+                        shot_team=play['team']['id']
+                        if shot_team == home:
+                            coords['d_team']=away
+                        else:
+                            coords['d_team']=home
                         if all(pos in coords.keys() for pos in goals.keys()):
                             goals = goals.append([coords])
     return misses,blocks,shots,goals
@@ -92,7 +108,7 @@ if __name__ == '__main__':
     gmid = 2017020001
     t_missed, t_blocked,t_shots,t_goals = get_all_shot_coords(db,coll)
     #
-    t_missed.to_csv('data/2017_missed.csv')
-    t_blocked.to_csv('data/2017_blocked.csv')
-    t_shots.to_csv('data/2017_shots.csv')
-    t_goals.to_csv('data/2017_goals.csv')
+    t_missed.to_csv('data/2017_missed_small.csv',index=False)
+    t_blocked.to_csv('data/2017_blocked_small.csv',index=False)
+    t_shots.to_csv('data/2017_shots_small.csv',index=False)
+    t_goals.to_csv('data/2017_goals_small.csv',index=False)
