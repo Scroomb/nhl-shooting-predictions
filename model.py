@@ -107,7 +107,8 @@ if __name__ == '__main__':
     # td = np.genfromtxt('data/2017_shots_goals_goalie.csv',delimiter=',')
 
     x_std,x_t_std,y_train,y_test,x_scaler = scale_transform_split(td)
-    # model = define_model(4)
+    model = define_model(7)
+    model.fit(x_std,y_train,epochs=50)
     # model = load_model('trained_model.h5')
 
     # model = KerasClassifier(build_fn=define_model,verbose=1,input_size=4,epochs=100,batch_size=32)
@@ -121,7 +122,7 @@ if __name__ == '__main__':
     # param_grid = dict(activation=hidden_activation,final_activation=final_activation,optimizer=optimizer)
 
     # NM vs PR
-    # pred_data = generate_prediction_data(8477492,8471469,18,x_scaler)
+    pred_data = generate_prediction_data(8477492,8471469,18,x_scaler)
 
     # GL vs PR
     # pred_data = generate_prediction_data(8477492,8471469,x_scaler)
