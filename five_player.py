@@ -1,6 +1,9 @@
+from imblearn.over_sampling import SMOTE
 import numpy as np
 import pandas as pd
 from make_graphs import player_shots_goals, goalie_shots_goals, load_shots_goals, plot_kde
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
 import pymongo
 from make_distributions import make_shot_density
 
@@ -55,7 +58,7 @@ def generate_prediction_data(goal_den,shot_den,miss_den,goalie_id,d_team,scaler)
 
     # unseen = np.concatenate((shooter,goalie,xy.T),axis=1)
     # unseen = pd.DataFrame(unseen,columns=['scorer','goalie','x','y'])
-    unseen = pd.DataFrame(xy.T,columns=['x',y'])
+    unseen = pd.DataFrame(xy.T,columns=['x','y'])
 
     unseen_data = []
     for row in unseen.iterrows():
