@@ -122,7 +122,7 @@ if __name__ == '__main__':
     # param_grid = dict(activation=hidden_activation,final_activation=final_activation,optimizer=optimizer)
 
     # NM vs PR
-    pred_data = generate_prediction_data(8477492,8471469,18,x_scaler)
+    # pred_data = generate_prediction_data(8477492,8471469,18,x_scaler)
 
     # GL vs PR
     # pred_data = generate_prediction_data(8477492,8471469,x_scaler)

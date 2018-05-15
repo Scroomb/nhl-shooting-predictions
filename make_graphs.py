@@ -188,7 +188,7 @@ def load_shots_goals(year):
 def plot_kde(density,player='test',type='test',save='test_vs_test'):
     xx,yy = np.meshgrid(np.arange(0,100,1),np.arange(-42,43,1))
     xy = np.vstack([xx.ravel(),yy.ravel()])
-    plt.pcolormesh(xx,yy,density.reshape(xx.shape),cmap=plt.cm.jet)
+    plt.pcolormesh(xx,yy,density.reshape(xx.shape),cmap=plt.cm.jet,shading='gouraud')
     plt.title(player + ' ' + type)
     plt.xlabel('X-coordinate 1-ft')
     plt.ylabel('Y-coordinate 1-ft')

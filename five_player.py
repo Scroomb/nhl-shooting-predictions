@@ -113,8 +113,8 @@ if __name__ == '__main__':
 
     goals_5,shots_5,missed_5 = get_5_player_data(list_of_players,goals,shots,missed)
 
-    den_5_g = make_shot_density(goals_5[['x','y']])
-    den_5_s = make_shot_density(shots_5[['x','y']])
-    den_5_m = make_shot_density(missed_5[['x','y']])
+    den_5_g = make_shot_density(goals_5[['x','y']]).reshape(85,100)
+    den_5_s = make_shot_density(shots_5[['x','y']]).reshape(85,100)
+    den_5_m = make_shot_density(missed_5[['x','y']]).reshape(85,100)
 
     avs_top_5 = generate_prediction_data(den_5_g,den_5_s,den_5_m,8471469,52,x_scaler)
