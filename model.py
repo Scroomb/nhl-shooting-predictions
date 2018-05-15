@@ -149,7 +149,7 @@ if __name__ == '__main__':
     # plot_kde(model.predict(josi_data),'Roman Josi vs Jonathan Bernier','Goals','josi_vs_jb')
     # plot_kde(model.predict(re_data),'Ryan Ellis vs Jonathan Bernier','Goals','re_vs_jb')
 
-    gs = GridSearchCV(estimator=model,param_grid=param_grid,n_jobs=-1,verbose=1,scoring=['acc','f1_score'])
+    gs = GridSearchCV(estimator=model,param_grid=param_grid,n_jobs=-1,verbose=1,scoring=['accuracy','f1_score'])
     gs.fit(x_std,y_train)
     print(gs.best_params_,gs.best_score_)
     print(gs.best_estimator_.score(x_t_std,y_test))
