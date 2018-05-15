@@ -32,7 +32,7 @@ def get_player_id(player_name):
     p_id = db['players'].find_one({'fullName':player_name},{'id':1})['id']
     return str(p_id)
 
-def single_row(db,rowgoalie,goal_den,shot_den,miss_den,d_team,year=2017):
+def single_row(db,row,goalie,goal_den,shot_den,miss_den,d_team,year=2017):
     # goalie = str(int(row['goalie']))
     # scorer = str(int(row[p_type]))
     # team = str(int(row[d_team]))
