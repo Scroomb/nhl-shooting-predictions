@@ -6,6 +6,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 import pymongo
 from make_distributions import make_shot_density
+import pickle as pkl
 
 def _init_mongo():
     client = pymongo.MongoClient()
