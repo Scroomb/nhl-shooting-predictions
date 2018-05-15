@@ -111,7 +111,8 @@ if __name__ == '__main__':
     # model.fit(x_std,y_train,epochs=5)
     # model = load_model('trained_model.h5')
 
-    model = KerasClassifier(build_fn=define_model,verbose=1,input_size=4,epochs=epochs,batch_size=batch_size)
+    # model = KerasClassifier(build_fn=define_model,verbose=1,input_size=4,epochs=epochs,batch_size=batch_size)
+    model = KerasClassifier(build_fn=define_model,verbose=1,input_size=7)
     # param_grid = dict(nuerons_layer_1=[25,50,100,500],neurons_layer_2=[25,50,100,500])
     param_grid = dict(epochs = [10,25,50,100], batch_size=[32,128,512]) # epochs = 100, batch_size = 32
     # init_mode = ['uniform', 'lecun_uniform', 'normal', 'zero', 'glorot_normal', 'glorot_uniform', 'he_normal', 'he_uniform']
