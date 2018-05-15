@@ -32,7 +32,7 @@ def get_player_id(player_name):
     p_id = db['players'].find_one({'fullName':player_name},{'id':1})['id']
     return str(p_id)
 
-def single_row(db,goalie,goal_den,shot_den,miss_den,d_team,year=2017):
+def single_row(db,rowgoalie,goal_den,shot_den,miss_den,d_team,year=2017):
     # goalie = str(int(row['goalie']))
     # scorer = str(int(row[p_type]))
     # team = str(int(row[d_team]))
@@ -62,7 +62,7 @@ def generate_prediction_data(goal_den,shot_den,miss_den,goalie_id,d_team,scaler)
 
     unseen_data = []
     for row in unseen.iterrows():
-        row_d = single_row(db,goalie,goal_den,shot_den,miss_den,d_team)
+        row_d = single_row(db,row[1],goalie,goal_den,shot_den,miss_den,d_team)
         unseen_data.append(row_d)
     unseen_data = np.array(unseen_data)
     # unseen_data_for_model = unseen_data[:,2:]
