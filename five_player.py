@@ -12,6 +12,19 @@ def _init_mongo():
     db = client.hockey
     return db
 
+def retrieve_team_density(db,team,year):
+    coll = db['team']
+    y = coll.find_one({'team':str(team)})['distribution'][0]['year_'+str(year)]
+    return pkl.loads(y)
+
+def retrieve_player_density(db,player,position,dist_type,year=2017):
+    coll = db['players_year_'+str(year)+str(year+1)]
+    if position == 'goalie':
+        y = coll.find_one({'player_id':player})[dist_type][0]
+    else:
+        y = coll.find_one({'player_id':player})[dist_type][0]
+    return pkl.loads(y)
+
 def load_data(year):
     goals = pd.read_csv('data/'+str(year)+'_goals.csv')
     goals.x = goals.x.abs()
