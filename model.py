@@ -112,15 +112,15 @@ if __name__ == '__main__':
     # model = load_model('trained_model.h5')
 
     # model = KerasClassifier(build_fn=define_model,verbose=1,input_size=4,epochs=epochs,batch_size=batch_size)
-    model = KerasClassifier(build_fn=define_model,verbose=1,input_size=7)
+    model = KerasClassifier(build_fn=define_model,verbose=1,input_size=7,epochs=100,batch_size=512)
     # param_grid = dict(nuerons_layer_1=[25,50,100,500],neurons_layer_2=[25,50,100,500])
-    param_grid = dict(epochs = [10,25,50,100], batch_size=[32,128,512]) # epochs = 100, batch_size = 32
-    # init_mode = ['uniform', 'lecun_uniform', 'normal', 'zero', 'glorot_normal', 'glorot_uniform', 'he_normal', 'he_uniform']
-    # droput_grid = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
-    # hidden_activation = ['softmax', 'softplus', 'softsign', 'relu', 'tanh', 'sigmoid', 'hard_sigmoid', 'linear']
-    # final_activation = ['tanh','sigmoid','hard_sigmoid','softmax']
-    # optimizer = ['SGD', 'RMSprop', 'Adagrad', 'Adadelta', 'Adam', 'Adamax', 'Nadam']
-    # param_grid = dict(activation=hidden_activation,final_activation=final_activation,optimizer=optimizer)
+    # param_grid = dict(epochs = [10,25,50,100], batch_size=[32,128,512]) # epochs = 100, batch_size = 32
+    init_mode = ['uniform', 'lecun_uniform', 'normal', 'zero', 'glorot_normal', 'glorot_uniform', 'he_normal', 'he_uniform']
+    droput_grid = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+    hidden_activation = ['softmax', 'softplus', 'softsign', 'relu', 'tanh', 'sigmoid', 'hard_sigmoid', 'linear']
+    final_activation = ['tanh','sigmoid','hard_sigmoid','softmax']
+    optimizer = ['SGD', 'RMSprop', 'Adagrad', 'Adadelta', 'Adam', 'Adamax', 'Nadam']
+    param_grid = dict(activation=hidden_activation,final_activation=final_activation,optimizer=optimizer,dropout_rate=droput_grid,init_mode=init_mode)
 
     # NM vs PR
     # pred_data = generate_prediction_data(8477492,8471469,18,x_scaler)
@@ -149,7 +149,7 @@ if __name__ == '__main__':
     # plot_kde(model.predict(josi_data),'Roman Josi vs Jonathan Bernier','Goals','josi_vs_jb')
     # plot_kde(model.predict(re_data),'Ryan Ellis vs Jonathan Bernier','Goals','re_vs_jb')
 
-    gs = GridSearchCV(estimator=model,param_grid=param_grid,n_jobs=-1,verbose=1,scoring=['accuracy','f1'])
+    gs = GridSearchCV(estimator=model,param_grid=param_grid,n_jobs=-1,verbose=1)
     gs.fit(x_std,y_train)
     print(gs.best_params_,gs.best_score_)
     print(gs.best_estimator_.score(x_t_std,y_test))
