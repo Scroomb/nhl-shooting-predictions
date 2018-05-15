@@ -35,7 +35,7 @@ def load_data(year):
     missed.x = missed.x.abs()
     return goals,shots,missed
 
-def get_5_player_data(players,goals,shots,missed):
+def get_multi_player_data(players,goals,shots,missed):
     goals_5 = goals[goals['scorer'].isin(players)]
     shots_5 = shots[shots['shooter'].isin(players)]
     missed_5 = missed[missed['shooter'].isin(players)]
@@ -111,7 +111,7 @@ if __name__ == '__main__':
 
     g = get_player_id('Pekka Rinne')
 
-    goals_5,shots_5,missed_5 = get_5_player_data(list_of_players,goals,shots,missed)
+    goals_5,shots_5,missed_5 = get_multi_player_data(list_of_players,goals,shots,missed)
 
     den_5_g = make_shot_density(goals_5[['x','y']]).reshape(85,100)
     den_5_s = make_shot_density(shots_5[['x','y']]).reshape(85,100)
