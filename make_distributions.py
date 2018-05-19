@@ -64,14 +64,14 @@ def generate_missed_distributions(missed):
             print(shooter[1], ' shooter missed dist exists')
 
 def generate_all_distributions(shots,goals,missed):
-    goalies = []
+    goalies = set()
     for x in goals.goalie.unique():
         goalies.append(('goalie',x))
-    goalies = np.array(goalies)
-    scorers = []
+    # goalies = np.array(goalies)
+    scorers = set()
     for x in goals.scorer.unique():
         scorers.append(('scorer',x))
-    scorers = np.array(scorers)
+    # scorers = np.array(scorers)
     for goalie in goalies:
         print(goalie[1])
         # shots_g, goals_g = goalie_shots_goals(int(goalie[1]),shots,goals)
