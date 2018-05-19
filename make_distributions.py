@@ -16,7 +16,7 @@ def _init_mongo():
 def make_shot_density(shots,cv=20):
     xx,yy = np.meshgrid(np.arange(0,100,1),np.arange(-42,43,1))
     xy = np.vstack([xx.ravel(),yy.ravel()])
-    grid = GridSearchCV(KernelDensity(),{'bandwidth':np.linspace(0.1,20,500)},cv=cv,n_jobs=-1,verbose=1)
+    grid = GridSearchCV(KernelDensity(),{'bandwidth':np.linspace(0.1,20,500)},cv=cv,n_jobs=-1)
     grid.fit(shots)
     print(grid.best_params_)
     return np.exp(grid.best_estimator_.score_samples(xy.T))
@@ -81,7 +81,7 @@ def generate_all_distributions(shots,goals,missed):
             for pp in ['even','pp']:
                 goals_g = g[(g['period']==period)&(g['pp_status']==pp)]
                 if goals_g.shape[0]<=20:
-                    if goals_g.shape[0]==1:
+                    if goals_g.shape[0]<=1:
                         continue
                     g_cv = goals_g.shape[0]
                 else:
