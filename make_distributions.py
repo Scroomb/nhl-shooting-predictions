@@ -128,7 +128,7 @@ def generate_all_distributions(shots,goals,missed):
                         continue
                     g_cv = goals_p.shape[0]
                 else:
-                    g_cv = 10
+                    g_cv = 5
                 if shots_p.shape[0]<=5:
                     print(scorer[1],'skipped')
                     continue
