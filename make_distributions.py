@@ -148,7 +148,7 @@ def generate_all_distributions(shots,goals,missed):
                 if 'missed_dist' not in db.players_year_20172018.find_one({'player_id':str(scorer[1])},\
                                       {'period.'+str(period)+'.'+pp+'.missed_dist':1}).keys():
                     density = make_shot_density(missed_p[['x','y']].values,m_cv)
-                    save_density_to_db('players_year_20172018',shooter[1],density,'missed_dist',shooter[0],period,pp)
+                    save_density_to_db('players_year_20172018',scorer[1],density,'missed_dist',scorer[0],period,pp)
                 else:
                     print(shooter[1], ' shooter missed dist exists')
 
