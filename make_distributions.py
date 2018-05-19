@@ -83,6 +83,7 @@ def generate_all_distributions(shots,goals,missed):
                 goals_g = g[(g['period']==period)&(g['pp_status']==pp)]
                 if goals_g.shape[0]<=20:
                     if goals_g.shape[0]<=1:
+                        print(goalie[1],'skipped')
                         continue
                     g_cv = goals_g.shape[0]
                 else:
