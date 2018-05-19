@@ -150,7 +150,7 @@ def generate_all_distributions(shots,goals,missed):
                     save_density_to_db('players_year_20172018',scorer[1],density,'missed_dist',scorer[0],period,pp)
                 else:
                     if not db.players_year_20172018.find_one({'player_id':str(scorer[1]), \
-                    'period.'+period+'.'+pp+'.goal_dist':{'$exists':True}}):
+                    'period.'+str(period)+'.'+pp+'.goal_dist':{'$exists':True}}):
                         density = make_shot_density(goals_p[['x','y']].values,g_cv)
                         save_density_to_db('players_year_20172018',scorer[1],density,'goal_dist', \
                         scorer[0],period,pp)
@@ -158,7 +158,7 @@ def generate_all_distributions(shots,goals,missed):
                         print(scorer[1], ' scorer goal dist exists')
 
                     if not db.players_year_20172018.find_one({'player_id':str(scorer[1]), \
-                        'period.'+period+'.'+pp+'.shot_dist':{'$exists':True}}):
+                        'period.'+str(period)+'.'+pp+'.shot_dist':{'$exists':True}}):
                         density = make_shot_density(shots_p[['x','y']].values,s_cv)
                         save_density_to_db('players_year_20172018',scorer[1],density,'shot_dist', \
                         scorer[0],period,pp)
@@ -166,7 +166,7 @@ def generate_all_distributions(shots,goals,missed):
                         print(scorer[1], ' scorer shot dist exists')
 
                     if not db.players_year_20172018.find_one({'player_id':str(scorer[1]), \
-                        'period.'+period+'.'+pp+'.missed_dist':{'$exists':True}}):
+                        'period.'+str(period)+'.'+pp+'.missed_dist':{'$exists':True}}):
                         density = make_shot_density(missed_p[['x','y']].values,m_cv)
                         save_density_to_db('players_year_20172018',scorer[1],density,'missed_dist', \
                         scorer[0],period,pp)
