@@ -66,11 +66,11 @@ def generate_missed_distributions(missed):
 def generate_all_distributions(shots,goals,missed):
     goalies = set()
     for x in goals.goalie.unique():
-        goalies.append(('goalie',x))
+        goalies.add(('goalie',x))
     # goalies = np.array(goalies)
     scorers = set()
     for x in goals.scorer.unique():
-        scorers.append(('scorer',x))
+        scorers.add(('scorer',x))
     # scorers = np.array(scorers)
     for goalie in goalies:
         print(goalie[1])
