@@ -116,7 +116,7 @@ def generate_all_distributions(shots,goals,missed):
             for pp in ['even','pp']:
                 goals_p = p_g[(p_g['period']==period)&(p_g['pp_status']==pp)]
                 shots_p = p_s[(p_s['period']==period)&(p_s['pp_status']==pp)]
-                missed_p = p_g[(p_m['period']==period)&(p_m['pp_status']==pp)]
+                missed_p = p_m[(p_m['period']==period)&(p_m['pp_status']==pp)]
                 if goals_p.shape[0]<=10:
                     if goals_p.shape[0]==1:
                         continue
