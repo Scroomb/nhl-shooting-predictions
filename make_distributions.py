@@ -25,7 +25,7 @@ def save_density_to_db(year,player,density,dist_type,position,period,pp):
     coll = db[year]
     y = bson.binary.Binary(pkl.dumps(density,protocol=2))
     # if position == 'goalie':
-    coll.update_one({'player_id':str(player)},{'$push':{'period.'+period+'.'+pp+'.'+dist_type:y}})
+    coll.update_one({'player_id':str(player)},{'$push':{'period.'+str(period)+'.'+pp+'.'+dist_type:y}})
     # else:
     #     coll.update_one({'player_id':player},{'$push':{dist_type:y}})
 
