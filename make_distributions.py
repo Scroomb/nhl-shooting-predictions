@@ -75,7 +75,7 @@ def generate_all_distributions(shots,goals,missed):
     for goalie in goalies:
         print(goalie[1])
         # shots_g, goals_g = goalie_shots_goals(int(goalie[1]),shots,goals)
-        g = goals[goals.goalie==p_id]
+        g = goals[goals.goalie==goalie]
         g.x = g.x.abs()
         for period in range(1,4):
             for pp in ['even','pp']:
@@ -105,9 +105,9 @@ def generate_all_distributions(shots,goals,missed):
     for scorer in scorers:
         print(scorer[1])
         # shots_p, goals_p = player_shots_goals(int(scorer[1]),shots,goals)
-        p_g = goals[goals.scorer==p_id]
-        p_s = shots[shots.shooter==p_id]
-        p_m = missed[missed.shooter==p_id]
+        p_g = goals[goals.scorer==scorer]
+        p_s = shots[shots.shooter==scorer]
+        p_m = missed[missed.shooter==scorer]
         p_g.x = p_g.x.abs()
         p_s.x = p_s.x.abs()
         p_m.x = p_m.x.abs()
