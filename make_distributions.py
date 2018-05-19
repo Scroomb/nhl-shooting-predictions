@@ -104,7 +104,7 @@ def generate_all_distributions(shots,goals,missed):
         #     print(goalie[1], ' goalie shot dist exists')
 
     for scorer in scorers:
-        print(scorer[1])
+        print(scorer[0],scorer[1])
         # shots_p, goals_p = player_shots_goals(int(scorer[1]),shots,goals)
         p_g = goals[goals.scorer==scorer[1]]
         p_s = shots[shots.shooter==scorer[1]]
