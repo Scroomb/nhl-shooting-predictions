@@ -106,8 +106,8 @@ def generate_all_distributions(shots,goals,missed):
         print(scorer[1])
         # shots_p, goals_p = player_shots_goals(int(scorer[1]),shots,goals)
         p_g = goals[goals.scorer==p_id]
-        p_s = shots[shots.shooter=p_id]
-        p_m = missed[missed.shooter=p_id]
+        p_s = shots[shots.shooter==p_id]
+        p_m = missed[missed.shooter==p_id]
         p_g.x = p_g.x.abs()
         p_s.x = p_s.x.abs()
         p_m.x = p_m.x.abs()
