@@ -132,12 +132,12 @@ def generate_all_distributions(shots,goals,missed):
                     print(scorer[1],'skipped')
                     continue
                 else:
-                    s_cv = 10
+                    s_cv = 5
                 if missed_p.shape[0]<=5:
                     print(scorer[1],'skipped')
                     continue
                 else:
-                    m_cv = 10
+                    m_cv = 5
                 if not db.players_year_20172018.find_one({'player_id':str(scorer[1]),'period':{'$exists':True}}):
                     density = make_shot_density(goals_p[['x','y']].values,g_cv)
                     save_density_to_db('players_year_20172018',scorer[1],density,'goal_dist',scorer[0],period,pp)
