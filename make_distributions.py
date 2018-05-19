@@ -171,7 +171,7 @@ def generate_all_distributions(shots,goals,missed):
                         save_density_to_db('players_year_20172018',scorer[1],density,'missed_dist', \
                         scorer[0],period,pp)
                     else:
-                        print(shooter[1], ' shooter missed dist exists')
+                        print(scorer[1], ' shooter missed dist exists')
 
 
 def single_row(db,row,p_type):
