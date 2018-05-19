@@ -185,7 +185,7 @@ def load_shots_goals(year):
     goals.x = goals.x.abs()
     return shots,goals
 
-def plot_kde(density,player='test',type='test',save='test_vs_test'):
+def plot_kde(density,player='test',type='test',save='test_vs_test',save_file=False):
     xx,yy = np.meshgrid(np.arange(0,100,1),np.arange(-42,43,1))
     xy = np.vstack([xx.ravel(),yy.ravel()])
     plt.pcolormesh(xx,yy,density.reshape(xx.shape),cmap=plt.cm.jet,shading='gouraud')
@@ -202,9 +202,11 @@ def plot_kde(density,player='test',type='test',save='test_vs_test'):
     plt.gca().add_patch(circle1)
     plt.gca().add_patch(circle2)
     plt.gca().add_patch(goal)
-    # plt.savefig('figs/'+save+'.png')
-    # print(save, ' saved')
-    plt.show()
+    if save_file:
+        plt.savefig('figs/'+save+'.png')
+        print(save, ' saved')
+    else:
+        plt.show()
 
 # if __name__ == '__main__':
     # db = _init_mongo()

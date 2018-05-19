@@ -55,9 +55,8 @@ def get_all_shot_coords(db,coll):
                             on_penalty=False
                     else:
                         coords['pp_status']='even'
-
-                    coords['home'] = home
-                    coords['away'] = away
+                    coords['home_id'] = home
+                    coords['away_id'] = away
                     for player in play['players']:
                         if not player['player']['id']:
                             print('no player')
@@ -108,7 +107,7 @@ if __name__ == '__main__':
     gmid = 2017020001
     t_missed, t_blocked,t_shots,t_goals = get_all_shot_coords(db,coll)
     #
-    t_missed.to_csv('data/2017_missed_small.csv',index=False)
-    t_blocked.to_csv('data/2017_blocked_small.csv',index=False)
-    t_shots.to_csv('data/2017_shots_small.csv',index=False)
-    t_goals.to_csv('data/2017_goals_small.csv',index=False)
+    t_missed.to_csv('data/2017_missed.csv',index=False)
+    t_blocked.to_csv('data/2017_blocked.csv',index=False)
+    t_shots.to_csv('data/2017_shots.csv',index=False)
+    t_goals.to_csv('data/2017_goals.csv',index=False)
