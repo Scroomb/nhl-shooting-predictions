@@ -18,7 +18,7 @@ def make_shot_density(shots,cv=20):
     xy = np.vstack([xx.ravel(),yy.ravel()])
     grid = GridSearchCV(KernelDensity(),{'bandwidth':np.linspace(0.1,20,500)},cv=cv,n_jobs=-1)
     grid.fit(shots)
-    print(grid.best_params_)
+    # print(grid.best_params_)
     return np.exp(grid.best_estimator_.score_samples(xy.T))
 
 def save_density_to_db(year,player,density,dist_type,position,period,pp):
@@ -73,12 +73,13 @@ def generate_all_distributions(shots,goals,missed):
         scorers.add(('scorer',x))
     # scorers = np.array(scorers)
     for goalie in goalies:
-        print(goalie[1])
+        # print(goalie[1])
         # shots_g, goals_g = goalie_shots_goals(int(goalie[1]),shots,goals)
         g = goals[goals.goalie==goalie[1]]
         g.x = g.x.abs()
         for period in range(1,4):
             for pp in ['even','pp']:
+                print(goalie[1],' ',period,' ',pp)
                 goals_g = g[(g['period']==period)&(g['pp_status']==pp)]
                 if goals_g.shape[0]<=20:
                     if goals_g.shape[0]<=1:
