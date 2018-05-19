@@ -121,53 +121,53 @@ def generate_all_distributions(shots,goals,missed):
                 goals_p = p_g[(p_g['period']==period)&(p_g['pp_status']==pp)]
                 shots_p = p_s[(p_s['period']==period)&(p_s['pp_status']==pp)]
                 missed_p = p_m[(p_m['period']==period)&(p_m['pp_status']==pp)]
-                if goals_p.shape[0]<=10:
+                if goals_p.shape[0]<=5:
                     if goals_p.shape[0]<=1:
                         print(scorer[1],'skipped')
                         continue
                     g_cv = goals_p.shape[0]
                 else:
                     g_cv = 10
-                if shots_p.shape[0]<=10:
+                if shots_p.shape[0]<=5:
                     print(scorer[1],'skipped')
                     continue
                 else:
                     s_cv = 10
-                if missed_p.shape[0]<=10:
+                if missed_p.shape[0]<=5:
                     print(scorer[1],'skipped')
                     continue
                 else:
                     m_cv = 10
 
-                density = make_shot_density(goals_p[['x','y']].values,g_cv)
-                save_density_to_db('players_year_20172018',scorer[1],density,'goal_dist',scorer[0],period,pp)
-
-                density = make_shot_density(shots_p[['x','y']].values,s_cv)
-                save_density_to_db('players_year_20172018',scorer[1],density,'shot_dist',scorer[0],period,pp)
-
-                density = make_shot_density(missed_p[['x','y']].values,m_cv)
-                save_density_to_db('players_year_20172018',scorer[1],density,'missed_dist',scorer[0],period,pp)
-
-                # if 'goal_dist' not in db.players_year_20172018.find_one({'player_id':str(scorer[1])})\
-                #                       ['period'][str(period)][pp].keys():
-                #     density = make_shot_density(goals_p[['x','y']].values,g_cv)
-                #     save_density_to_db('players_year_20172018',scorer[1],density,'goal_dist',scorer[0],period,pp)
-                # else:
-                #     print(scorer[1], ' scorer goal dist exists')
+                # density = make_shot_density(goals_p[['x','y']].values,g_cv)
+                # save_density_to_db('players_year_20172018',scorer[1],density,'goal_dist',scorer[0],period,pp)
                 #
-                # if 'shot_dist' not in db.players_year_20172018.find_one({'player_id':str(scorer[1])})\
-                #                       ['period'][str(period)][pp].keys():
-                #     density = make_shot_density(shots_p[['x','y']].values,s_cv)
-                #     save_density_to_db('players_year_20172018',scorer[1],density,'shot_dist',scorer[0],period,pp)
-                # else:
-                #     print(scorer[1], ' scorer shot dist exists')
+                # density = make_shot_density(shots_p[['x','y']].values,s_cv)
+                # save_density_to_db('players_year_20172018',scorer[1],density,'shot_dist',scorer[0],period,pp)
                 #
-                # if 'missed_dist' not in db.players_year_20172018.find_one({'player_id':str(scorer[1])})\
-                #                       ['period'][str(period)][pp].keys():
-                #     density = make_shot_density(missed_p[['x','y']].values,m_cv)
-                #     save_density_to_db('players_year_20172018',scorer[1],density,'missed_dist',scorer[0],period,pp)
-                # else:
-                #     print(shooter[1], ' shooter missed dist exists')
+                # density = make_shot_density(missed_p[['x','y']].values,m_cv)
+                # save_density_to_db('players_year_20172018',scorer[1],density,'missed_dist',scorer[0],period,pp)
+
+                if 'goal_dist' not in db.players_year_20172018.find_one({'player_id':str(scorer[1])})\
+                                      ['period'][str(period)][pp].keys():
+                    density = make_shot_density(goals_p[['x','y']].values,g_cv)
+                    save_density_to_db('players_year_20172018',scorer[1],density,'goal_dist',scorer[0],period,pp)
+                else:
+                    print(scorer[1], ' scorer goal dist exists')
+
+                if 'shot_dist' not in db.players_year_20172018.find_one({'player_id':str(scorer[1])})\
+                                      ['period'][str(period)][pp].keys():
+                    density = make_shot_density(shots_p[['x','y']].values,s_cv)
+                    save_density_to_db('players_year_20172018',scorer[1],density,'shot_dist',scorer[0],period,pp)
+                else:
+                    print(scorer[1], ' scorer shot dist exists')
+
+                if 'missed_dist' not in db.players_year_20172018.find_one({'player_id':str(scorer[1])})\
+                                      ['period'][str(period)][pp].keys():
+                    density = make_shot_density(missed_p[['x','y']].values,m_cv)
+                    save_density_to_db('players_year_20172018',scorer[1],density,'missed_dist',scorer[0],period,pp)
+                else:
+                    print(shooter[1], ' shooter missed dist exists')
 
 
 def single_row(db,row,p_type):
