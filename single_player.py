@@ -30,9 +30,9 @@ class SinglePlayer(object):
         self.shot = None
         self.miss = None
         self.goal = None
-        # self.shot_den = None
-        # self.miss_den = None
-        # self.goal_den = None
+        self.shot_den = None
+        self.miss_den = None
+        self.goal_den = None
         # self.pred_data = None
         self.pp = pp
 
@@ -66,8 +66,9 @@ class SinglePlayer(object):
         self.opponent_goalie_dist = 1-self.retrieve_player_density('save_dist').reshape(85,100)
 
     def get_player_id(self,players):
-        p_id = {self.db['players'].find_one({'fullName':player},{'id':1})['id'] \
-          for player in players}
+        # p_id = {self.db['players'].find_one({'fullName':player},{'id':1})['id'] \
+        #   for player in players}
+        p_id = self.db['players'].find_one({'fullName':player},{'id':1})['id']
         return p_id
 
     def get_player_data(self,shots,goals,missed):
