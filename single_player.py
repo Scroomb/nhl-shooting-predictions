@@ -63,8 +63,7 @@ class SinglePlayer(object):
         self.opponent_goalie = opponent_goalie
         self.opponent_goalie_id = self.get_player_id(opponent_goalie)
         self.opponent_dist = self.retrieve_team_density(opponent)
-        self.opponent_goalie_dist = 1-self.retrieve_player_density( \
-         str(self.opponent_goalie_id),'goalie','save_dist').reshape(85,100)
+        self.opponent_goalie_dist = 1-self.retrieve_player_density('save_dist').reshape(85,100)
 
     def get_player_id(self,players):
         p_id = {self.db['players'].find_one({'fullName':player},{'id':1})['id'] \
@@ -97,13 +96,20 @@ class SinglePlayer(object):
         grid.fit(df)
         return np.exp(grid.best_estimator_.score_samples(xy.T))
 
-    def retrieve_player_density(self,player,position,dist_type):
+    def retrieve_player_density(self,dist_type):
         coll = self.db['players_year_'+str(self.year)+str(self.year+1)]
-        if position == 'goalie':
-            y = coll.find_one({'player_id':player})[dist_type][0]
+        # y = coll.find_one({'player_id':player,'period.'+period+'.'+pp+'.'+ \
+                # dist_type:{$exists:1}},{'period.'+period+'.'+pp+'.'+dist_type:1})
+        if dist_type == 'save_dist':
+            y = coll.find_one({'player_id':self.opponent_goalie_id},{dist_type:1)
         else:
-            y = coll.find_one({'player_id':player})[dist_type][0]
+            y = coll.find_one({'player_id':self.player_id},{dist_type:1)
         return pkl.loads(y)
+
+    def populate_full_densities(self):
+        self.shot_den = retrieve_player_density('shot_dist')
+        self.miss_den = retrieve_player_density('missed_dist')
+        self.goal_den = retrieve_player_density('goal_dist')
 
     def single_row(self,row):
         x = int(row['x'])
@@ -115,17 +121,19 @@ class SinglePlayer(object):
         t_b_den = self.opponent_dist[y][x]
         return np.append(row,[p_g_den,g_g_den,p_s_den,p_m_den,t_b_den])
 
-    def generate_prediction_data(self,period):
+    def generate_prediction_data(self,period=1):
         xx,yy = np.meshgrid(np.arange(0,100,1),np.arange(-42,43,1))
         xy = np.vstack([xx.ravel(),yy.ravel()])
         goalie = int(self.opponent_goalie_id)
         unseen = pd.DataFrame(xy.T,columns=['x','y'])
         unseen_data = []
         for row in unseen.iterrows():
-            row_d = single_row(db,row[1],goalie,self.goal_den,self.shot_den, \
-                    self.miss_den,self.opposing_team)
+            row_d = self.single_row(row[1])
             unseen_data.append(row_d)
         unseen_data = np.array(unseen_data)
         return self.scaler.transform(unseen_data)
 
-    def generate_predictions(self):
+    def generate_predictions(self,dist_types='full'):
+        pred_data = self.generate_prediction_data()
+        pred = self.model.predict(pred_data)
+        plot_kde(pred,self.player,' vs '+self.opponent_goalie+' Full',True)
