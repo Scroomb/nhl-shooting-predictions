@@ -65,7 +65,7 @@ class SinglePlayer(object):
         self.opponent_dist = self.retrieve_team_density(opponent)
         self.opponent_goalie_dist = 1-self.retrieve_player_density('save_dist').reshape(85,100)
 
-    def get_player_id(self,players):
+    def get_player_id(self,player):
         # p_id = {self.db['players'].find_one({'fullName':player},{'id':1})['id'] \
         #   for player in players}
         p_id = self.db['players'].find_one({'fullName':player},{'id':1})['id']
