@@ -101,9 +101,9 @@ class SinglePlayer(object):
         # y = coll.find_one({'player_id':player,'period.'+period+'.'+pp+'.'+ \
                 # dist_type:{$exists:1}},{'period.'+period+'.'+pp+'.'+dist_type:1})
         if dist_type == 'save_dist':
-            y = coll.find_one({'player_id':self.opponent_goalie_id},{dist_type:1)
+            y = coll.find_one({'player_id':self.opponent_goalie_id},{dist_type:1})
         else:
-            y = coll.find_one({'player_id':self.player_id},{dist_type:1)
+            y = coll.find_one({'player_id':self.player_id},{dist_type:1})
         return pkl.loads(y)
 
     def populate_full_densities(self):
