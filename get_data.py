@@ -76,6 +76,13 @@ def _init_mongo():
     db = client.hockey
     return db
 
+def get_team_names(db):
+    for x in db.team.find({},{'team':1}):
+        endpoint = 'https://statsapi.web.nhl.com/api/v1/teams/' + str(x['team'])
+        json = single_query(endpoint)
+        db.team.update_one({'_id':x['_id']},{'$push':{'name':json['teams'][0]['name']}})
+
+
 if __name__ == '__main__':
     db = _init_mongo()
     shots, goals = load_shots_goals(2017)

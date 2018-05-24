@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-from make_graphs import plot_kde
+import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.neighbors import KernelDensity
 from sklearn.preprocessing import StandardScaler
@@ -8,6 +8,7 @@ import pymongo
 from keras.models import load_model
 import pickle as pkl
 from sklearn.externals import joblib
+
 
 class SinglePlayer(object):
     '''
@@ -23,6 +24,7 @@ class SinglePlayer(object):
         self.db = self._init_mongo()
         self.player_id = self.get_player_id(player)
         self.opponent = None
+        self.opponent_name = None
         self.opponent_goalie = None
         self.opponent_goalie_id = None
         self.opponent_dist = None
@@ -55,27 +57,31 @@ class SinglePlayer(object):
         y = coll.find_one({'team':str(team)})['distribution'][0]['year_'+str(self.year)]
         return pkl.loads(y)
 
-    def populate_opponent(self,opponent,opponent_goalie):
+    def populate_opponent(self,opponent,opponent_goalie,opponent_name):
         '''
         Populate opposing team/goalie data
         '''
+        self.opponent_name = opponent_name
         self.opponent = opponent
         self.opponent_goalie = opponent_goalie
         self.opponent_goalie_id = self.get_player_id(opponent_goalie)
+        for g in self.opponent_goalie_id:
+            self.opponent_goalie_id = g
         self.opponent_dist = self.retrieve_team_density(opponent)
-        self.opponent_goalie_dist = 1-self.retrieve_player_density('save_dist').reshape(85,100)
+        self.opponent_goalie_dist = 1-self.retrieve_player_density('save_dist')
 
-    def get_player_id(self,player):
-        # p_id = {self.db['players'].find_one({'fullName':player},{'id':1})['id'] \
-        #   for player in players}
-        p_id = self.db['players'].find_one({'fullName':player},{'id':1})['id']
+    def get_player_id(self,players):
+        p_id = [self.db['players'].find_one({'fullName':player},{'id':1})['id'] \
+          for player in players]
+        # p_id = self.db['players'].find_one({'fullName':player},{'id':1})['id']
         return p_id
 
     def get_player_data(self,shots,goals,missed):
         self.shot = shots[shots['shooter'].isin(self.player_id)]
         self.miss = missed[missed['shooter'].isin(self.player_id)]
         self.goal = goals[goals['scorer'].isin(self.player_id)]
-        self.gen_player_densities()
+        # self.gen_player_densities()
+        self.populate_full_densities()
 
     def gen_player_densities(self,period):
         shot = self.shot[(self.shot['period']==period)& \
@@ -102,15 +108,16 @@ class SinglePlayer(object):
         # y = coll.find_one({'player_id':player,'period.'+period+'.'+pp+'.'+ \
                 # dist_type:{$exists:1}},{'period.'+period+'.'+pp+'.'+dist_type:1})
         if dist_type == 'save_dist':
-            y = coll.find_one({'player_id':self.opponent_goalie_id},{dist_type:1})
+            y = coll.find_one({'player_id':str(self.opponent_goalie_id)})[dist_type][0]
         else:
-            y = coll.find_one({'player_id':self.player_id},{dist_type:1})
-        return pkl.loads(y)
+            for p in self.player_id:
+                y = coll.find_one({'player_id':str(p)})[dist_type][0]
+        return pkl.loads(y).reshape(85,100)
 
     def populate_full_densities(self):
-        self.shot_den = retrieve_player_density('shot_dist')
-        self.miss_den = retrieve_player_density('missed_dist')
-        self.goal_den = retrieve_player_density('goal_dist')
+        self.shot_den = self.retrieve_player_density('shot_dist')
+        self.miss_den = self.retrieve_player_density('missed_dist')
+        self.goal_den = self.retrieve_player_density('goal_dist')
 
     def single_row(self,row):
         x = int(row['x'])
@@ -137,4 +144,44 @@ class SinglePlayer(object):
     def generate_predictions(self,dist_types='full'):
         pred_data = self.generate_prediction_data()
         pred = self.model.predict(pred_data)
-        plot_kde(pred,self.player,' vs '+self.opponent_goalie+' Full',True)
+        self.plot_kde(pred,self.player[0],'vs '+self.opponent_goalie[0]+' Full','player_pred',True)
+
+    def plot_player_densities(self):
+        self.plot_kde(self.shot_den,self.player[0],'Shots','player_shots',True)
+        self.plot_kde(self.miss_den,self.player[0],'Misses','player_misses',True)
+        self.plot_kde(self.goal_den,self.player[0],'Goals','player_goals',True)
+        self.plot_kde(self.opponent_dist,str(self.opponent_name),'Blocks','opponent_blocks',True)
+        self.plot_kde(self.opponent_goalie_dist,self.opponent_goalie[0],'Saves','opp_goalie',True)
+
+    def plot_kde(self,density,player='test',type='test',save='test_vs_test',save_file=False):
+        xx,yy = np.meshgrid(np.arange(0,100,1),np.arange(-42,43,1))
+        xy = np.vstack([xx.ravel(),yy.ravel()])
+        z = density.reshape(xx.shape)
+        plt.pcolormesh(xx,yy,z,cmap=plt.cm.jet,shading='gouraud')
+        plt.title(player + ' ' + type)
+        plt.xlabel('X-coordinate 1-ft')
+        plt.ylabel('Y-coordinate 1-ft')
+        plt.axvline(x=25,c='k')
+        plt.axvline(x=89,c='k')
+        circle1 = plt.Circle((69,-22),radius=15,clip_on=False, zorder=10, linewidth=1,
+                        edgecolor='black', facecolor=(0, 0, 0, .0001))
+        circle2 = plt.Circle((69,22),radius=15,clip_on=False, zorder=10, linewidth=1,
+                        edgecolor='black', facecolor=(0, 0, 0, .0001))
+        goal = plt.Rectangle((89,-3),44/12,6,edgecolor='black', facecolor=(0,0,0,.0001))
+        plt.gca().add_patch(circle1)
+        plt.gca().add_patch(circle2)
+        plt.gca().add_patch(goal)
+        if save_file:
+            plt.savefig('static/figs/'+save+'.png')
+            print(save, ' saved')
+        else:
+            plt.show()
+
+if __name__ == '__main__':
+    from make_distributions import load_data
+    goals,shots,missed = load_data(2017)
+
+    sp = SinglePlayer(['Nathan MacKinnon'],2017)
+    sp.populate_opponent(52,['Pekka Rinne'])
+    sp.get_player_data(shots,goals,missed)
+    sp.generate_predictions()
