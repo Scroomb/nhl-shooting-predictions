@@ -25,34 +25,6 @@
       }
 
     </style>
-    <!-- <script src="https://code.jquery.com/jquery-3.2.1.min.js"
-      integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
-      crossorigin="anonymous">
-    </script> -->
-    <script>
-      $(document).ready(function() {
-        $('#team').change(function() {
-
-          var teams = $('#team').val();
-
-      //     Make Ajax Request and expect JSON-encoded data
-          $.getJSON(
-            '/get_goalies' + '/' + team,
-            function(data) {
-
-              // Remove old options
-              $('#goalies').find('option').remove();
-
-              // Add new items
-              $.each(data, function(key, val) {
-                var option_item = '<option value="' + val + '">' + val + '</option>'
-                $('#goalies').append(option_item);
-              });
-            }
-          );
-        });
-      });
-    </script>
 
   </head>
 
